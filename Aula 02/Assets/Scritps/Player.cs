@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     public float gravity;
 
     private Transform cam;
+
+    private Animator anim;
     
     Vector3 moveDirection;
     
@@ -18,6 +20,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        anim = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         cam = Camera.main.transform;
     }
@@ -26,6 +29,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         Move();
+        GetMouseInput();
     }
 
     void Move()
@@ -46,10 +50,11 @@ public class Player : MonoBehaviour
 
                 moveDirection = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * speed;
             
-                
+                anim.SetInteger("transition", 1);
             }
             else
             {
+                anim.SetInteger("transition", 0);
                 moveDirection = Vector3.zero;
             }
         }
@@ -58,5 +63,17 @@ public class Player : MonoBehaviour
         
         controller.Move(moveDirection * Time.deltaTime);
 
+    }
+
+
+    void GetMouseInput()
+    {
+        if (controller.isGrounded)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                anim.SetInteger("transition", 2);
+            }
+        }
     }
 }
