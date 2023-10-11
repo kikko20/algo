@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,9 @@ public class Player : MonoBehaviour
     
     public float smoothRotTime;
     private float turnSmoothVelocity;
+
+    public float colliderRadius;
+    public List<Transform> enemyList = new List<Transform>();
 
     // Start is called before the first frame update
     void Start()
@@ -72,8 +76,44 @@ public class Player : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                anim.SetInteger("transition", 2);
+                StartCoroutine("Attack");
             }
         }
+    }
+
+    IEnumerable Attack()
+    {
+        anim.SetInteger("transition", 2);
+        
+        yield return new WaitForSeconds(0.4f);
+        
+        getEnemiesList();
+
+        foreach(Transform e in enemyList)
+        {
+            Debug.Log(e.name);
+        }
+
+        yield return new WaitForSeconds(1f);
+        
+        anim.SetInteger("transition", 0);
+    }
+
+    void getEnemiesList()
+    {
+        enemyList.Clear();
+        foreach (Collider c in Physics.OverlapSphere((transform.position + transform.forward * colliderRadius), colliderRadius))
+        {
+            if(c.gameObject.CompareTag("Enemy"))
+            {
+                enemyList.Add(c.transform);
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position + transform.forward, colliderRadius);
     }
 }
